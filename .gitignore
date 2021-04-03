@@ -159,3 +159,5 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/kotlin,java,intellij,gradle
 
 /Stickers/
+/node_modules/
+.DS_Store

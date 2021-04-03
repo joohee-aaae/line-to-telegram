@@ -1,0 +1,23 @@
+{
+  "name": "line-to-telegram",
+  "version": "1.0.0",
+  "description": "### What? Tool to convert a set of Line stickers into Telegram stickers.",
+  "main": "size.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joohee-aaae/line-to-telegram.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joohee-aaae/line-to-telegram/issues"
+  },
+  "homepage": "https://github.com/joohee-aaae/line-to-telegram#readme",
+  "dependencies": {
+    "image-size": "^0.9.7",
+    "sharp": "^0.28.0"
+  }
+}
