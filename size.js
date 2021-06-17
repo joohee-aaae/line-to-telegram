@@ -23,7 +23,7 @@ const sizeOf = require("image-size");
 //      ㄴ 사이징 디렉토리로 이동
 
 const stickerRoot = "./Stickers";
-const sizingRoot = `${stickerRoot}/_sizing`;
+const destRoot = "./images";
 
 function mapAsync(array, callback) {
   return Promise.all(array.map(callback));
@@ -41,37 +41,44 @@ async function filterAsync(array, callback) {
       const dir = `${stickerRoot}/${target}`;
       const stat = await fsPrm.lstat(dir);
 
-      return dir !== sizingRoot && stat.isDirectory();
+      return dir !== destRoot && stat.isDirectory();
     }
   );
 
   await mapAsync(stickerPack, async (sticker) => {
-    const sizingDir = `${sizingRoot}/${sticker}`;
     const stickerDir = `${stickerRoot}/${sticker}`;
+    const destDir = `${destRoot}/${sticker}`;
+    const originDistDir = `${destRoot}/${sticker}/origin`;
 
-    const exist = await fs.existsSync(sizingDir);
-    !exist && (await fs.mkdirSync(sizingDir));
+    const existDest = await fs.existsSync(destDir);
+    const existOriginDest = await fs.existsSync(originDistDir);
+
+    !existDest && (await fs.mkdirSync(destDir));
+    !existOriginDest && (await fs.mkdirSync(originDistDir));
 
     const stickerList = await fs.readdirSync(stickerDir);
 
-    stickerList.map((file) => {
+    await mapAsync(stickerList, async (file) => {
       const resource = `${stickerDir}/${file}`;
-      const { width, type } = sizeOf(resource);
+      const { width, height, type } = sizeOf(resource);
       const ext = path.extname(file);
       const name = path.basename(file, ext);
+      const resize = width > height ? { width: 512 } : { height: 512 };
 
-      sharp(resource)
+      await sharp(resource)
         .resize({
-          height: 200,
-          width: 512,
+          ...resize,
           fit: "contain",
           position: "left",
           background: { r: 0, g: 0, b: 0, alpha: 0 },
         })
-        .toFile(`${sizingDir}/${name}_w512.${type}`)
-        .then(() => {
-          console.log(`${resource} finish`);
-        });
+        .toFile(`${destDir}/${name}_512.${type}`);
+
+      await fsPrm.rename(resource, `${originDistDir}/${file}`);
+
+      console.log(`${resource} finish`);
     });
+
+    fs.rmdirSync(stickerDir, { recursive: true });
   });
 })().catch(console.error);
